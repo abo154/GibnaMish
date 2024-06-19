@@ -13,7 +13,6 @@ The following engines have taught me a lot about chess programming, and I would 
 The following parts of the code are from other projects. I would like to thank their authors for their work, and their respective licenses remain the same:
 
 - [chess-library](https://github.com/Disservin/chess-library) [MIT License](https://github.com/Disservin/chess-library/blob/master/LICENSE)
-- [Incbin](https://github.com/graphitemaster/incbin) [UNLICENSE](https://github.com/graphitemaster/incbin/blob/main/UNLICENSE)
 - [pystring](https://github.com/imageworks/pystring) [BSD-3-Clause License](https://github.com/imageworks/pystring/blob/master/LICENSE)
 
 ## Special Thanks
