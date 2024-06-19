@@ -36,10 +36,10 @@ namespace global
 
 			// DRAW
 			return (
-					(moves_size == 0 && !is_White_King_attaked && !is_Black_King_attaked) || // STALEMATE
-					Board.isRepetition(1) || // REPETITION
-					Board.isInsufficientMaterial() || // INSUFFICIENT MATERIAL
-					(Board.isHalfMoveDraw() && !is_White_King_attaked && !is_Black_King_attaked) // HALF MOVE DRAW
+				(moves_size == 0 && !is_White_King_attaked && !is_Black_King_attaked) || // STALEMATE
+				Board.isRepetition(1) || // REPETITION
+				Board.isInsufficientMaterial() || // INSUFFICIENT MATERIAL
+				(Board.isHalfMoveDraw() && !is_White_King_attaked && !is_Black_King_attaked) // HALF MOVE DRAW
 				);
 		}
 		inline const int is_mate_score(const int score)

@@ -76,6 +76,8 @@ inline void UCI::Process_Set_Options_Command(const std::string& command)
 
 inline void UCI::Process_Go_Command(const std::string& command)
 {
+	if (this->core.is_avilable()) { std::cout << "info string NNUE evaluation using nn-04cf2b4ed1da.nnue enabled" << std::endl; }
+
 	if (command.find("infinite") != std::string::npos) { this->core.get_score_move(-1, 0, 0, 0, 0, true); }
 	else if (command.find("depth") != std::string::npos) { this->core.get_score_move(unsigned(std::atoll(pystring::split(command).back().c_str())), 0, 0, 0, 0, true); }
 	else if (command.find("movetime") != std::string::npos)

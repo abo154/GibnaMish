@@ -33,7 +33,7 @@ public:
 	inline void clear_history();
 	inline void clear_killer_moves();
 	inline void clear();
-	std::array<Killers, global::MAX_PLY + 1> KillerMoves;
+	std::array<Killers, 32> KillerMoves;
 	std::array<std::array<std::array<int, 64>, 64>, 2> History;
 	~MoveOrdering();
 private:

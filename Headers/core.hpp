@@ -14,10 +14,12 @@ class Core
 	using Move = chess::Move;
 	using MoveValue = std::pair<Move, int>;
 public:
+	inline void init_NNUE(const char*);
 	inline void setMoves(const std::vector<std::string>&);
 	inline void set_fen(std::string&);
 	inline void get_score_move(const uint32_t, const size_t, const size_t, const size_t, const size_t, const bool);
 	inline void draw() const;
+	inline bool is_avilable() const;
 	inline void Stop_Thinking();
 private:
 	chess::Board Board;
@@ -74,6 +76,16 @@ inline void Core::get_score_move(const uint32_t DEPTH, const size_t wtime, const
 inline void Core::Stop_Thinking()
 {
 	this->searcher.is_search_canceled = true;
+}
+
+inline void Core::init_NNUE(const char * evalFile)
+{
+	this->searcher.init_NNUE(evalFile);
+}
+
+inline bool Core::is_avilable() const
+{
+	return this->searcher.is_avilable();
 }
 
 inline void Core::draw() const

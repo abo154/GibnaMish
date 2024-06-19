@@ -15,6 +15,7 @@ The following parts of the code are from other projects. I would like to thank t
 - [chess-library](https://github.com/Disservin/chess-library) [MIT License](https://github.com/Disservin/chess-library/blob/master/LICENSE)
 - [Incbin](https://github.com/graphitemaster/incbin) [UNLICENSE](https://github.com/graphitemaster/incbin/blob/main/UNLICENSE)
 - [pystring](https://github.com/imageworks/pystring) [BSD-3-Clause License](https://github.com/imageworks/pystring/blob/master/LICENSE)
+- [nnue-probe](https://github.com/dshawul/nnue-probe) [GPL-3.0 License](https://github.com/dshawul/nnue-probe/blob/master/LICENSE)
 
 ## Special Thanks
 I would like to add special thanks to [Disservin](https://github.com/Disservin) for his projects, which have greatly contributed to my work on GibnaMish.

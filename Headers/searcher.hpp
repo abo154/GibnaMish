@@ -28,6 +28,8 @@ class Searcher
 public:
 	Searcher();
 	MoveValue IterativeDeepening(chess::Board&, const uint32_t);
+	inline void init_NNUE(const char*);
+	inline bool is_avilable() const;
 	inline void clear();
 
 	time_t WaitTime;
@@ -58,6 +60,11 @@ private:
 	MoveValue QSearch(chess::Board&, const uint32_t, int, int, const bool, const uint32_t);
 };
 
+inline void Searcher::init_NNUE(const char* evalFile)
+{
+	this->evaluation.init_NNUE(evalFile);
+}
+
 inline const std::string Searcher::get_pv()
 {
 	std::string line = "";
@@ -83,6 +90,11 @@ inline const bool Searcher::exit_early()
 		}
 	}
 	return false;
+}
+
+inline bool Searcher::is_avilable() const
+{
+	return this->evaluation.is_avilable();
 }
 
 inline void Searcher::clear()

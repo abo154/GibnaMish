@@ -2,11 +2,11 @@
 #ifndef _UCI_HPP_
 #define _UCI_HPP_
 
-#include <utility>
 #include <iostream>
+#include <utility>
 
-#include "core.hpp"
 #include "../pystring/pystring.hpp"
+#include "core.hpp"
 
 class UCI
 {

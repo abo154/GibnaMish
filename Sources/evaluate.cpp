@@ -1,13 +1,13 @@
-#include "../Headers/global.hpp"
-#include "../Headers/evaluate.hpp"
 #include "../Headers/piecesbouns.hpp"
+#include "../Headers/evaluate.hpp"
+#include "../Headers/global.hpp"
 
 Evaluate::Evaluate()
 {
 	piecesbouns::init_pieces_bouns();
 }
 
-int Evaluate::evaluate(const chess::Board& Board)
+const int Evaluate::Manuale_evaluate(const chess::Board& Board)
 {
 	using PHASE = piecesbouns::PHASE;
 	using Punderlying = piecesbouns::Punderlying;
@@ -141,4 +141,36 @@ inline const Evaluate::MG_EG Evaluate::Calc_adjustment(const chess::Board& Board
 	}
 
 	return { eval_mg, eval_eg };
+}
+
+void Evaluate::Handle_NNUE_Inputs(const chess::Board& Board)
+{
+	chess::Bitboard all_pieces = Board.occ();
+	int index = 2;
+
+	while (all_pieces)
+	{
+		const uint8_t square = all_pieces.pop();
+		const chess::Piece piece = Board.at(square);
+
+		if (piece == chess::Piece::WHITEKING)
+		{
+			this->pieces[0] = nnue.nnue_pieces[piece];
+			this->squares[0] = nnue.nnue_squares[square];
+		}
+		else if (piece == chess::Piece::BLACKKING)
+		{
+			this->pieces[1] = nnue.nnue_pieces[piece];
+			this->squares[1] = nnue.nnue_squares[square];
+		}
+		else
+		{
+			this->pieces[index] = nnue.nnue_pieces[piece];
+			this->squares[index] = nnue.nnue_squares[square];
+			index++;
+		}
+	}
+
+	this->pieces[index] = 0;
+	this->squares[index] = 0;
 }

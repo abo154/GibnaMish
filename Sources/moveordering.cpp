@@ -3,7 +3,7 @@
 
 MoveOrdering::MoveOrdering(TranspositionTable& TT):
 	tt(TT),
-	maxKillerMovePly(global::MAX_PLY + 1)
+	maxKillerMovePly(32)
 {}
 
 MoveOrdering::Killers::Killers():
