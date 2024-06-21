@@ -28,7 +28,7 @@ I would like to add special thanks to [Disservin](https://github.com/Disservin) 
 ### Building
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/GibnaMish.git
+    git clone https://github.com/abo154/GibnaMish.git
     cd GibnaMish
     ```
 
