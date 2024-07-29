@@ -8,6 +8,7 @@ The following engines have taught me a lot about chess programming, and I would 
 
 - [Stockfish](https://github.com/official-stockfish/Stockfish)
 - [Smallbrain](https://github.com/Disservin/Smallbrain)
+- [Chess-Coding-Adventure](https://github.com/SebLague/Chess-Coding-Adventure)
 
 ## Tools
 The following parts of the code are from other projects. I would like to thank their authors for their work, and their respective licenses remain the same:
