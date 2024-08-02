@@ -2,9 +2,9 @@
 #ifndef _SEARCHER_HPP_
 #define _SEARCHER_HPP_
 
-#include <limits>
 #include <chrono>
 
+#include "global.hpp"
 #include "evaluate.hpp"
 #include "moveordering.hpp"
 #include "chesslib/chess.hpp"
@@ -26,9 +26,9 @@ class Searcher
 	using TT_NodeType = TranspositionTable::NodeType;
 	using time_point = std::chrono::system_clock::time_point;
 public:
-	Searcher();
+	Searcher(TranspositionTable&);
 	MoveValue IterativeDeepening(chess::Board&, const uint32_t);
-	inline void clear();
+	void clear();
 
 	time_t WaitTime;
 	time_t StartTime;
@@ -45,50 +45,17 @@ private:
 
 	Evaluate evaluation;
 	MoveOrdering OrderingMove;
-	TranspositionTable tt;
+	TranspositionTable& tt;
 	uint8_t seldepth;
 	uint64_t nodes;
 	uint8_t pv_length[global::MAX_PLY];
 	Move pv_table[global::MAX_PLY][global::MAX_PLY];
 
-	inline const std::string get_pv();
-	inline const bool exit_early();
+	std::string get_pv();
+	bool exit_early();
 	MoveValue ASearch(chess::Board&, const uint32_t, const bool, const MoveValue);
 	MoveValue Search(chess::Board&, const uint32_t, int, int, int, const bool, const uint32_t, const bool);
 	MoveValue QSearch(chess::Board&, const uint32_t, int, int, const bool, const uint32_t);
 };
-
-inline const std::string Searcher::get_pv()
-{
-	std::string line = "";
-	for (int i = 0; i < this->pv_length[0]; i++)
-	{
-		line += chess::uci::moveToUci(this->pv_table[0][i]);
-		line += " ";
-	}
-	return line;
-}
-
-inline const bool Searcher::exit_early()
-{
-	if (this->is_search_canceled) { return true; }
-	if (this->nodes & 2047 && this->WaitTime != 0)
-	{
-		auto t1 = std::chrono::high_resolution_clock::now();
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t1).count();
-		if (ms >= this->WaitTime)
-		{
-			this->is_search_canceled = true;
-			return true;
-		}
-	}
-	return false;
-}
-
-inline void Searcher::clear()
-{
-	this->OrderingMove.clear();
-	this->tt.clear();
-}
 
 #endif // !_SEARCHER_HPP_

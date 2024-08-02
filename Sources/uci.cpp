@@ -1,3 +1,6 @@
+#include <iostream>
+#include <utility>
+
 #include "../Headers/uci.hpp"
 
 void UCI::Response(const std::string& message)
@@ -5,32 +8,32 @@ void UCI::Response(const std::string& message)
 	if (message == "uci")
 	{
 		std::cout
-			<< "option name Threads type spin default 1 min 1 max 1024" << std::endl
-			<< "option name EvalFile type string default nothing.nnue " << std::endl
+			// << "option name Threads type spin default 1 min 1 max 1024\n"
+			// << "option name EvalFile type string default nothing.nnue\n"
+			<< "option name Hash type spin default 16 min 1 max 33554432\n"
 			<< "uciok" << std::endl;
 	}
-	else if (message == "ucinewgame") {}
+
+	else if (message == "ucinewgame")
+		this->core.reset_board();
+
 	else if (message == "isready")
-	{
 		std::cout << "readyok" << std::endl;
-	}
+
 	else if (message.find("position") != std::string::npos)
-	{
 		this->Process_Position_Command(message);
-	}
+
 	else if (message.find("go") != std::string::npos)
-	{
 		this->Process_Go_Command(message);
-	}
+
 	else if (message.find("setoption") != std::string::npos)
-	{
 		this->Process_Set_Options_Command(message);
-	}
+
 	else if (message == "stop") { this->core.Stop_Thinking(); }
 	else if (message == "d") { core.draw(); }
 }
 
-inline void UCI::Main_Loop()
+void UCI::Main_Loop()
 {
 	std::string message;
 
@@ -41,7 +44,7 @@ inline void UCI::Main_Loop()
 	}
 }
 
-inline void UCI::Process_Position_Command(const std::string& command)
+void UCI::Process_Position_Command(const std::string& command)
 {
 	std::string FEN = chess::constants::STARTPOS;
 	std::vector<std::string> MOVES;
@@ -49,40 +52,47 @@ inline void UCI::Process_Position_Command(const std::string& command)
 	size_t moves_pos = command.find("moves");
 
 	if (fen_pos != std::string::npos)
-	{
-		FEN = pystring::strip(std::string((command.begin() + fen_pos + 3),
-			moves_pos != std::string::npos ? (command.begin() + moves_pos) : command.end()));
-	}
+		FEN = pystring::strip(
+			std::string((command.begin() + fen_pos + 3),
+			moves_pos != std::string::npos ? (command.begin() + moves_pos) : command.end())
+		);
+
 	if (moves_pos != std::string::npos)
-	{
 		pystring::split(pystring::strip(std::string((command.begin() + moves_pos + 5), command.end())), MOVES);
-	}
 
 	core.set_fen(FEN);
 	core.setMoves(MOVES);
 }
 
-inline void UCI::Process_Set_Options_Command(const std::string& command)
+void UCI::Process_Set_Options_Command(const std::string& command)
 {
 	const std::vector<std::string> text = pystring::split(command);
 	const std::pair< std::string, std::string> Option(pystring::strip(text[2]), pystring::strip(text.back()));
 
 	if (Option.first == "EvalFile")
 	{
-		//if (text.size() != 4) { this->core.init_NNUE("nn-04cf2b4ed1da.nnue"); }
-		//else { this->core.init_NNUE(Option.second.c_str()); }
+		
+	}
+	else if (Option.first == "Hash")
+	{
+		
 	}
 }
 
-inline void UCI::Process_Go_Command(const std::string& command)
+void UCI::Process_Go_Command(const std::string& command)
 {
-	if (command.find("infinite") != std::string::npos) { this->core.get_score_move(-1, 0, 0, 0, 0, true); }
-	else if (command.find("depth") != std::string::npos) { this->core.get_score_move(unsigned(std::atoll(pystring::split(command).back().c_str())), 0, 0, 0, 0, true); }
+	if (command.find("infinite") != std::string::npos)
+		this->core.get_score_move(-1, 0, 0, 0, 0, true);
+
+	else if (command.find("depth") != std::string::npos)
+		this->core.get_score_move(unsigned(std::atoll(pystring::split(command).back().c_str())), 0, 0, 0, 0, true);
+
 	else if (command.find("movetime") != std::string::npos)
 	{
 		const size_t Time = std::atoll(pystring::split(command).back().c_str());
 		this->core.get_score_move(-1, Time, 0, Time, 0, false);
 	}
+
 	else
 	{
 		std::vector<std::string> Splitted = pystring::split(command);

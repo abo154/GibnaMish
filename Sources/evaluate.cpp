@@ -71,7 +71,7 @@ int Evaluate::evaluate(const chess::Board& Board)
 	return (((eval_mg * (256 - phase)) + (eval_eg * phase)) / 256) * (Board.sideToMove() * -2 + 1);
 }
 
-inline const int Evaluate::ForceKingToCenter(const chess::Board& Board, const chess::Color my_king_color)
+int Evaluate::ForceKingToCenter(const chess::Board& Board, const chess::Color my_king_color)
 {
 	int eval = 0;
 
@@ -109,7 +109,7 @@ inline const int Evaluate::ForceKingToCenter(const chess::Board& Board, const ch
 	return int(eval * 10 * end_game_weight);
 }
 
-inline const Evaluate::MG_EG Evaluate::Calc_adjustment(const chess::Board& Board)
+Evaluate::MG_EG Evaluate::Calc_adjustment(const chess::Board& Board)
 {
 	const uint8_t MG = uint8_t(piecesbouns::PHASE::MG);
 	const uint8_t EG = uint8_t(piecesbouns::PHASE::EG);

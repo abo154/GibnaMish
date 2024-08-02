@@ -3,8 +3,8 @@
 #define _MOVE_ORDERING_HPP_
 
 #include <array>
-#include <algorithm>
 
+#include "global.hpp"
 #include "chesslib/chess.hpp"
 #include "transpositiontable.hpp"
 
@@ -24,15 +24,15 @@ public:
 		Move moveB;
 
 		Killers();
-		inline void Add(const Move);
-		inline const bool Match(const Move) const;
+		void Add(const Move);
+		const bool Match(const Move) const;
 	};
 
 	MoveOrdering(TranspositionTable&);
-	void Order(const chess::Board&, chess::Movelist&, const bool, const uint32_t);
-	inline void clear_history();
-	inline void clear_killer_moves();
-	inline void clear();
+	void Order(const chess::Board&, Movelist&, const bool, const uint32_t);
+	void clear_history();
+	void clear_killer_moves();
+	void clear();
 	std::array<Killers, global::MAX_PLY + 1> KillerMoves;
 	std::array<std::array<std::array<int, 64>, 64>, 2> History;
 	~MoveOrdering();
@@ -50,35 +50,5 @@ private:
 	const uint32_t maxKillerMovePly;
 	TranspositionTable& tt;
 };
-
-inline void MoveOrdering::Killers::Add(const Move move)
-{
-	if (move.score() != moveA.score())
-	{
-		moveB = moveA;
-		moveA = move;
-	}
-}
-
-inline const bool MoveOrdering::Killers::Match(const Move move) const
-{
-	return (move.score() == moveA.score() || move.score() == moveB.score());
-}
-
-inline void MoveOrdering::clear_history()
-{
-	for (std::array<std::array<int, 64>, 64>& arr1 : this->History) { for (std::array<int, 64>& arr2 : arr1) { arr2.fill({}); } }
-}
-
-inline void MoveOrdering::clear_killer_moves()
-{
-	this->KillerMoves.fill({});
-}
-
-inline void MoveOrdering::clear()
-{
-	this->clear_history();
-	this->clear_killer_moves();
-}
 
 #endif // !_MOVE_ORDERING_HPP_

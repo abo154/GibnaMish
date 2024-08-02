@@ -1,8 +1,9 @@
-#include "../Headers/global.hpp"
+#include <limits>
+
 #include "../Headers/searcher.hpp"
 #include "../Headers/piecesbouns.hpp"
 
-Searcher::Searcher():
+Searcher::Searcher(TranspositionTable& TT):
 	nodes(0),
 	seldepth(0),
 	StartTime(0),
@@ -10,8 +11,8 @@ Searcher::Searcher():
 	is_inf(true),
 	is_search_finished(true),
 	is_search_canceled(false),
-	tt(16),
-	OrderingMove(tt)
+	tt(TT),
+	OrderingMove(TT)
 {}
 
 Searcher::MoveValue Searcher::Search(chess::Board& Board, const uint32_t depth, int alpha, int beta, int num_extent, const bool is_max, const uint32_t PlyD, const bool null)
@@ -203,7 +204,13 @@ Searcher::MoveValue Searcher::IterativeDeepening(chess::Board& Board, const uint
 	for (uint32_t depth = 1; depth <= DEPTH; depth++)
 	{
 		const MoveValue result = this->ASearch(Board, depth, true, final_result);
-		if (!this->is_search_finished || this->is_search_canceled) { this->is_search_canceled = false; this->is_search_finished = true; break; }
+		if (!this->is_search_finished || this->is_search_canceled)
+		{
+			this->is_search_canceled = false;
+			this->is_search_finished = true;
+			break;
+		}
+
 		final_result = result;
 
 		const int& score = result.second;
@@ -224,4 +231,38 @@ Searcher::MoveValue Searcher::IterativeDeepening(chess::Board& Board, const uint
 
 	this->clear();
 	return final_result;
+}
+
+
+std::string Searcher::get_pv()
+{
+	std::string line = "";
+	for (int i = 0; i < this->pv_length[0]; i++)
+	{
+		line += chess::uci::moveToUci(this->pv_table[0][i]);
+		line += " ";
+	}
+	return line;
+}
+
+bool Searcher::exit_early()
+{
+	if (this->is_search_canceled) { return true; }
+	if (this->nodes & 2047 && this->WaitTime != 0)
+	{
+		auto t1 = std::chrono::high_resolution_clock::now();
+		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t1).count();
+		if (ms >= this->WaitTime)
+		{
+			this->is_search_canceled = true;
+			return true;
+		}
+	}
+	return false;
+}
+
+void Searcher::clear()
+{
+	this->OrderingMove.clear();
+	this->tt.clear();
 }

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "../Headers/piecesbouns.hpp"
 #include "../Headers/moveordering.hpp"
 
@@ -11,7 +13,7 @@ MoveOrdering::Killers::Killers():
 	moveB(Move::NO_MOVE)
 {}
 
-void MoveOrdering::Order(const chess::Board& Board, chess::Movelist& Moves, const bool inQSearch, const uint32_t PlyD)
+void MoveOrdering::Order(const chess::Board& Board, Movelist& Moves, const bool inQSearch, const uint32_t PlyD)
 {
 	if (Moves.size() <= 0) { return; }
 	for (Move& move : Moves)
@@ -44,6 +46,36 @@ void MoveOrdering::Order(const chess::Board& Board, chess::Movelist& Moves, cons
 	}
 
 	std::sort(Moves.begin(), Moves.end(), [](const Move& c1, const Move& c2) { return c1.score() > c2.score(); });
+}
+
+void MoveOrdering::Killers::Add(const Move move)
+{
+	if (move.score() != moveA.score())
+	{
+		moveB = moveA;
+		moveA = move;
+	}
+}
+
+const bool MoveOrdering::Killers::Match(const Move move) const
+{
+	return (move.score() == moveA.score() || move.score() == moveB.score());
+}
+
+void MoveOrdering::clear_history()
+{
+	for (std::array<std::array<int, 64>, 64>& arr1 : this->History) { for (std::array<int, 64>& arr2 : arr1) { arr2.fill({}); } }
+}
+
+void MoveOrdering::clear_killer_moves()
+{
+	this->KillerMoves.fill({});
+}
+
+void MoveOrdering::clear()
+{
+	this->clear_history();
+	this->clear_killer_moves();
 }
 
 MoveOrdering::~MoveOrdering()

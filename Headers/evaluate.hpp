@@ -15,8 +15,8 @@ private:
 	using PieceType = chess::PieceType;
 	using Color = chess::Color;
 
-	inline const int ForceKingToCenter(const chess::Board&, const chess::Color);
-	inline const MG_EG Calc_adjustment(const chess::Board&);
+	int ForceKingToCenter(const chess::Board&, const chess::Color);
+	MG_EG Calc_adjustment(const chess::Board&);
 };
 
 #endif // !_EVALUATE_HPP_
