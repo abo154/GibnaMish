@@ -8,11 +8,11 @@
 class UCI
 {
 public:
-	void Response(const std::string&);
 	void Main_Loop();
 private:
 	Core core;
 
+	void Response(const std::string&);
 	void Process_Position_Command(const std::string&);
 	void Process_Set_Options_Command(const std::string&);
 	void Process_Go_Command(const std::string&);
