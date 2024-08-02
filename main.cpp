@@ -5,6 +5,8 @@
 int main(void)
 {
 	UCI Engine;
+	// Engine.Main_Loop();
+
 	std::string message;
 
 	while (message != "quit")
