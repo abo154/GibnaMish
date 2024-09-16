@@ -1,13 +1,7 @@
-#include "../Headers/global.hpp"
 #include "../Headers/evaluate.hpp"
 #include "../Headers/piecesbouns.hpp"
 
-Evaluate::Evaluate()
-{
-	piecesbouns::init_pieces_bouns();
-}
-
-int Evaluate::evaluate(const chess::Board& Board)
+Score Evaluate::evaluate(const chess::Board& Board)
 {
 	using PHASE = piecesbouns::PHASE;
 	using Punderlying = piecesbouns::Punderlying;
@@ -50,7 +44,7 @@ int Evaluate::evaluate(const chess::Board& Board)
 		((wrooks - brooks) * piecesbouns::PicesValues[uint8_t(PHASE::EG)][uint8_t(Punderlying::ROOK)]) +
 		((wqueens - bqueens) * piecesbouns::PicesValues[uint8_t(PHASE::EG)][uint8_t(Punderlying::QUEEN)]);
 
-	const MG_EG mg_eg = this->Calc_adjustment(Board);
+	const MG_EG mg_eg = Calc_adjustment(Board);
 	eval_mg += mg_eg.first;
 	eval_eg += mg_eg.second;
 
@@ -71,7 +65,7 @@ int Evaluate::evaluate(const chess::Board& Board)
 	return (((eval_mg * (256 - phase)) + (eval_eg * phase)) / 256) * (Board.sideToMove() * -2 + 1);
 }
 
-int Evaluate::ForceKingToCenter(const chess::Board& Board, const chess::Color my_king_color)
+Score Evaluate::ForceKingToCenter(const chess::Board& Board, const chess::Color my_king_color)
 {
 	int eval = 0;
 

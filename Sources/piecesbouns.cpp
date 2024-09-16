@@ -1,6 +1,6 @@
 #include "../Headers/piecesbouns.hpp"
 
-void piecesbouns::Reverse_Copy(int sarr[], const int arr[], const int size)
+constexpr void piecesbouns::Reverse_Copy(int sarr[], const int arr[], const int size)
 {
 	for (size_t i = 0; i < 8; ++i)
 		for (size_t j = 0; j < 8; ++j)

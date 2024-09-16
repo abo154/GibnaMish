@@ -14,7 +14,9 @@ namespace piecesbouns
 		NO_PHASE
 	};
 
-	inline constexpr int PicesValues[2][6] = { { 126, 781, 825, 1276, 2538, 0}, { 208, 854, 915, 1380, 2682, 0} };
+	inline constexpr int PicesValues[2][7] = { { 126, 781, 825, 1276, 2538, 0, 0 }, { 208, 854, 915, 1380, 2682, 0, 0 } };
+	inline constexpr int PicesValuesClassical[7] = { 100, 320, 330, 500, 900, 0, 0 };
+
 	inline int pieceSquareScore[2][6][2][64] = {
 		{
 			{
@@ -177,11 +179,8 @@ namespace piecesbouns
 			}
 		}
 	};
-	/****************************************************************************************/
-	/***************************************Functions****************************************/
-	/****************************************************************************************/
 
-	void Reverse_Copy(int[], const int[], const int);
+	constexpr void Reverse_Copy(int[], const int[], const int);
 	void init_pieces_bouns();
 }
 

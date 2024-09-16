@@ -4,58 +4,76 @@
 
 #include <chrono>
 
-#include "global.hpp"
+#include "table.hpp"
+#include "types.hpp"
 #include "evaluate.hpp"
-#include "moveordering.hpp"
 #include "chesslib/chess.hpp"
 #include "transpositiontable.hpp"
 
-#define LONG_LONG_TIME_NOW_MS std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count()
-inline constexpr int INFINITE = 2147483645;
+struct Stack
+{
+	Score eval;
+	int move_count;
+	chess::Move currentmove;
+	chess::Move excluded_move;
+	uint16_t ply;
+};
+
+struct Killers
+{
+	Move moveA;
+	Move moveB;
+
+	Killers();
+	void Add(const Move);
+	const bool Match(const Move) const;
+};
 
 class Searcher
 {
 	using Move = chess::Move;
 	using Color = chess::Color;
 	using Square = chess::Square;
-	using Moves = chess::Movelist;
 	using movegen = chess::movegen;
-	using MoveValue = std::pair<Move, int>;
-	using size_type = chess::Movelist::size_type;
+	using size_type = Movelist::size_type;
 	using MoveGenType = chess::movegen::MoveGenType;
-	using TT_NodeType = TranspositionTable::NodeType;
-	using time_point = std::chrono::system_clock::time_point;
+	using TimePoint = std::chrono::high_resolution_clock;
 public:
-	Searcher(TranspositionTable&);
-	MoveValue IterativeDeepening(chess::Board&, const uint32_t);
-	void clear();
+	Searcher(const chess::Board& = chess::Board());
+	void IterativeDeepening();
+	void StartThinking();
+	void reset();
 
-	time_t WaitTime;
-	time_t StartTime;
-	bool is_inf;
-	bool is_search_finished;
-	bool is_search_canceled;
+	TimePoint::time_point StartTime;
+	Limits limit;
+	uint64_t nodes;
+	uint8_t id;
+	Table<Move, Square::max(), Square::max()> Counters = {};
+	Table<uint64_t, Square::max(), Square::max()> node_effort = {};
+	Table<Score, 2, Square::max(), Square::max()> History = {};
+	Table<Killers, MAX_PLY + 1> KillerMoves = {};
+	chess::Board Board;
+	Movelist searchmoves;
+	bool silent;
+	bool use_tb;
 private:
-	enum class NodeType : uint8_t
+	enum NodeType: uint8_t
 	{
-		NonPV,
+		NONPV,
 		PV,
-		Root
+		ROOT
 	};
 
-	Evaluate evaluation;
-	MoveOrdering OrderingMove;
-	TranspositionTable& tt;
 	uint8_t seldepth;
-	uint64_t nodes;
-	uint8_t pv_length[global::MAX_PLY];
-	Move pv_table[global::MAX_PLY][global::MAX_PLY];
+	Table<uint8_t, MAX_PLY + 1> pv_length = {};
+	Table<Move, MAX_PLY + 1, MAX_PLY + 1> pv_table = {};
 
 	std::string get_pv();
+	long long elapsed();
 	bool exit_early();
-	MoveValue ASearch(chess::Board&, const uint32_t, const bool, const MoveValue);
-	MoveValue Search(chess::Board&, const uint32_t, int, int, int, const bool, const uint32_t, const bool);
-	MoveValue QSearch(chess::Board&, const uint32_t, int, int, const bool, const uint32_t);
+	MoveValue ASearch(const Depth, const bool, const MoveValue, Stack* ss);
+	template <NodeType> MoveValue ABSearch(Depth, Score, Score, const bool, Stack* ss);
+	template <NodeType> MoveValue QSearch(Score, Score, const bool, Stack* ss);
 };
 
 #endif // !_SEARCHER_HPP_

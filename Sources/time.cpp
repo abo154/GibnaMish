@@ -1,6 +1,9 @@
+#include <cmath>
+#include <algorithm>
+
 #include "../Headers/time.hpp"
 
-size_t Time::get_correct_time(const size_t& myTimeRemainingMs, const size_t& myIncrementMs)
+size_t Timer::get_correct_time(size_t myTimeRemainingMs, size_t myIncrementMs, size_t mtg)
 {
 	// Get a fraction of remaining time to use for current move
 	double thinkTimeMs = myTimeRemainingMs / (40.0);

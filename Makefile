@@ -11,20 +11,42 @@ else
 endif
 
 ifeq ($(build), release)
-	CFLAGS = -Wall -std=c++20 -static -O3 -mtune=native -static-libgcc -static-libstdc++ -pie -lm -fstrict-aliasing -fno-exceptions -fno-rtti -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Ofast -fomit-frame-pointer -DIS_64BIT -DUSE_AVX2 -mavx2 -DUSE_SSE41 -DUSE_SSE3 -msse3 -DUSE_SSE2 -msse2 -DUSE_SSE -msse -fexceptions -fPIC
+	CFLAGS = -Wall -std=c++20 -static -O3 -mtune=native -static-libgcc -static-libstdc++ -pie -lm -fno-rtti -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fPIC -flto
 else
-	CFLAGS = -Wall -std=c++20 -static -O3 -DNDEBUG -mtune=native -static-libgcc -static-libstdc++ -pie -lm -fstrict-aliasing -fno-exceptions -fno-rtti -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Ofast -fomit-frame-pointer -DIS_64BIT -DUSE_AVX2 -mavx2 -DUSE_SSE41 -DUSE_SSE3 -msse3 -DUSE_SSE2 -msse2 -DUSE_SSE -msse -fexceptions -fPIC
+	CFLAGS = -Wall -std=c++20 -static -O3 -DNDEBUG -mtune=native -static-libgcc -static-libstdc++ -pie -lm -fno-rtti -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fPIC -flto
 endif
 
-SRC_DIRS := Sources pystring
+OBJ_DIR := obj
+SRC_DIRS := Sources nnue
 SRCS := $(wildcard $(addsuffix /*.cpp, $(SRC_DIRS))) main.cpp
-OBJS := $(patsubst %.cpp,%.o,$(SRCS))
+OBJS := $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
-GibnaMish: $(OBJS)
+GibnaMish: $(OBJ_DIR) $(OBJS)
 	g++ -o GibnaMish $(OBJS) $(CFLAGS)
+ifeq ($(OS), Windows_NT)
+	-rmdir /S /Q $(OBJ_DIR)
+else
+	rm -rf $(OBJ_DIR)
+endif
 
-%.o: %.cpp
+$(OBJ_DIR):
+ifeq ($(OS), Windows_NT)
+	mkdir $(OBJ_DIR)
+else
+	mkdir -p $(OBJ_DIR)
+endif
+
+$(OBJ_DIR)/%.o: $(SRC_DIRS)/%.cpp
+	g++ -c $(CFLAGS) -flto $(TARGET) -std=c++20 -Wall $< -o $@
+
+$(OBJ_DIR)/main.o: main.cpp
 	g++ -c $(CFLAGS) -flto $(TARGET) -std=c++20 -Wall $< -o $@
 
 clean:
-	rm -f $(OBJS) GibnaMish
+ifeq ($(OS), Windows_NT)
+	-del /Q $(OBJ_DIR)\*.o GibnaMish.exe
+	-rmdir /S /Q $(OBJ_DIR)
+else
+	rm -f $(OBJ_DIR)/*.o GibnaMish
+	rm -rf $(OBJ_DIR)
+endif

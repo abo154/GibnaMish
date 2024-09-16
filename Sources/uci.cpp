@@ -2,35 +2,27 @@
 #include <utility>
 
 #include "../Headers/uci.hpp"
+#include "../Headers/options.hpp"
+#include "../Headers/str_utils.hpp"
 
-void UCI::Response(const std::string& message)
+constexpr uint64_t UCI_MAX_HASH_MB = static_cast<uint64_t>(TranspositionTable::MAXHASH_MiB * (1024 * 1024) / (1e6));
+extern TranspositionTable tt;
+extern ThreadPool Threads;
+Options options;
+static std::string convertScore(Score);
+
+UCI::UCI()
 {
-	if (message == "uci")
-	{
-		std::cout
-			// << "option name Threads type spin default 1 min 1 max 1024\n"
-			// << "option name EvalFile type string default nothing.nnue\n"
-			<< "option name Hash type spin default 16 min 1 max 33554432\n"
-			<< "uciok" << std::endl;
-	}
+	options = Options();
+	this->Board = chess::Board();
 
-	else if (message == "ucinewgame")
-		this->core.reset_board();
+	options.add(Option{"Hash", "spin", "16", "16", "1", std::to_string(UCI_MAX_HASH_MB)});  // Size in MB
+	options.add(Option{"Threads", "spin", "1", "1", "1", "256"});
+	// options.add(Option{"SyzygyPath", "string", "", "", "", ""});
+	// options.add(Option{"UCI_Chess960", "check", "false", "false", "", ""});
+	// options.add(Option{"UCI_ShowWDL", "check", "false", "false", "", ""});
 
-	else if (message == "isready")
-		std::cout << "readyok" << std::endl;
-
-	else if (message.find("position") != std::string::npos)
-		this->Process_Position_Command(message);
-
-	else if (message.find("go") != std::string::npos)
-		this->Process_Go_Command(message);
-
-	else if (message.find("setoption") != std::string::npos)
-		this->Process_Set_Options_Command(message);
-
-	else if (message == "stop") { this->core.Stop_Thinking(); }
-	else if (message == "d") { core.draw(); }
+	this->ApplyOptions();
 }
 
 void UCI::Main_Loop()
@@ -42,78 +34,164 @@ void UCI::Main_Loop()
 		std::getline(std::cin, message);
 		this->Response(message);
 	}
+	Threads.kill();
+}
+
+void UCI::Response(const std::string& message)
+{
+	std::vector<std::string> tokens = str_util::splitString(message, ' ');
+
+	if (!tokens.empty())
+	{
+		if (tokens[0] == "uci")
+			this->Uci();
+
+		else if (tokens[0] == "ucinewgame")
+			this->Uci_New_Game();
+
+		else if (tokens[0] == "isready")
+			std::cout << "readyok" << std::endl;
+
+		else if (tokens[0] == "position")
+			this->Process_Position_Command(message);
+
+		else if (tokens[0] == "go")
+			this->Process_Go_Command(message);
+
+		else if (tokens[0] == "setoption")
+			this->Process_Set_Options_Command(message);
+
+		else if (tokens[0] == "eval")
+			std::cout << convertScore(Evaluate::evaluate(this->Board)) << std::endl;
+
+		else if (tokens[0] == "d" || tokens[0] == "draw")
+		{
+			#ifdef _WIN32
+				system("cls");
+			#else
+				system("clear");
+			#endif
+			std::cout << this->Board;
+		}
+
+		else if (tokens[0] == "cls" || tokens[0] == "clear")
+		{
+			#ifdef _WIN32
+				system("cls");
+			#else
+				system("clear");
+			#endif
+		}
+
+		else if (tokens[0] == "stop")
+			Threads.kill();
+	}
+}
+
+void UCI::Uci()
+{
+	std::cout << "id author abo154\n" << std::endl;
+	options.print();
+	std::cout << "uciok" << std::endl;
+}
+
+void UCI::Uci_New_Game()
+{
+	this->Board = chess::Board();
+	tt.reset();
+	Threads.kill();
 }
 
 void UCI::Process_Position_Command(const std::string& command)
 {
-	std::string FEN = chess::constants::STARTPOS;
-	std::vector<std::string> MOVES;
-	size_t fen_pos = command.find("fen");
-	size_t moves_pos = command.find("moves");
+	const auto fen_range = str_util::findRange(command, "fen", "moves");
 
-	if (fen_pos != std::string::npos)
-		FEN = pystring::strip(
-			std::string((command.begin() + fen_pos + 3),
-			moves_pos != std::string::npos ? (command.begin() + moves_pos) : command.end())
-		);
+	const auto fen = str_util::contains(command, "fen") ? command.substr(command.find("fen") + 4, fen_range) : chess::constants::STARTPOS;
 
-	if (moves_pos != std::string::npos)
-		pystring::split(pystring::strip(std::string((command.begin() + moves_pos + 5), command.end())), MOVES);
+	const auto moves = str_util::contains(command, "moves") ? command.substr(command.find("moves") + 6) : "";
+	const auto moves_vec = str_util::splitString(moves, ' ');
 
-	core.set_fen(FEN);
-	core.setMoves(MOVES);
+	this->Board.setFen(fen);
+
+	for (const auto& move : moves_vec)
+		this->Board.makeMove(chess::uci::uciToMove(this->Board, move));
 }
 
 void UCI::Process_Set_Options_Command(const std::string& command)
 {
-	const std::vector<std::string> text = pystring::split(command);
-	const std::pair< std::string, std::string> Option(pystring::strip(text[2]), pystring::strip(text.back()));
-
-	if (Option.first == "EvalFile")
-	{
-		
-	}
-	else if (Option.first == "Hash")
-	{
-		
-	}
+	options.set(command);
+	this->ApplyOptions();
 }
 
 void UCI::Process_Go_Command(const std::string& command)
 {
-	if (command.find("infinite") != std::string::npos)
-		this->core.get_score_move(-1, 0, 0, 0, 0, true);
+	Threads.kill();
+	Limits limit;
 
-	else if (command.find("depth") != std::string::npos)
-		this->core.get_score_move(unsigned(std::atoll(pystring::split(command).back().c_str())), 0, 0, 0, 0, true);
+	const auto tokens = str_util::splitString(command, ' ');
 
-	else if (command.find("movetime") != std::string::npos)
+	if (tokens.size() == 1) limit.infinite = true;
+
+	limit.depth = str_util::findElement<int>(tokens, "depth").value_or(MAX_PLY - 1);
+	limit.infinite = str_util::findElement<std::string>(tokens, "go").value_or("") == "infinite";
+	limit.nodes = str_util::findElement<int64_t>(tokens, "nodes").value_or(0);
+	limit.time = str_util::findElement<int64_t>(tokens, "movetime").value_or(0);
+
+	std::string uci_time = this->Board.sideToMove() == chess::Color::WHITE ? "wtime" : "btime";
+	std::string uci_inc = this->Board.sideToMove() == chess::Color::WHITE ? "winc" : "binc";
+
+	if (str_util::contains(command, uci_time))
 	{
-		const size_t Time = std::atoll(pystring::split(command).back().c_str());
-		this->core.get_score_move(-1, Time, 0, Time, 0, false);
+		auto time = str_util::findElement<int>(tokens, uci_time).value_or(0);
+		auto inc = str_util::findElement<int>(tokens, uci_inc).value_or(0);
+		auto mtg = str_util::findElement<int>(tokens, "movestogo").value_or(0);
+
+		limit.time = this->timer.get_correct_time(time, inc, 40);
 	}
 
+	if (str_util::contains(command, "searchmoves"))
+	{
+		const auto searchmoves = str_util::findElement<std::string>(tokens, "searchmoves").value_or("");
+		const auto moves = str_util::splitString(searchmoves, ' ');
+
+		this->Searchmoves.clear();
+
+		for (const auto& move : moves)
+			this->Searchmoves.add(chess::uci::uciToMove(this->Board, move));
+	}
+
+	Threads.start(this->Board, limit, this->Searchmoves, this->worker_threads, this->use_tb);
+}
+
+void UCI::ApplyOptions()
+{
+	// const auto path = options.get<std::string>("SyzygyPath");
+
+	// if (!path.empty()) {
+	// 	if (tb_init(path.c_str())) {
+	// 		use_tb_ = true;
+	// 		std::cout << "info string successfully loaded syzygy path " << path << std::endl;
+	// 	} else {
+	// 		std::cout << "info string failed to load syzygy path " << path << std::endl;
+	// 	}
+	// }
+
+	this->worker_threads = options.get<int>("Threads");
+	// board_.chess960 = options.get<bool>("UCI_Chess960");
+
+	tt.resize(options.get<int>("Hash"));
+}
+
+std::string convertScore(Score score)
+{
+	constexpr int NormalizeToPawnValue = 131;
+
+	if (std::abs(score) <= 4) score = 0;
+
+	if (score >= VALUE_MATE_IN_PLY)
+		return "mate " + std::to_string(((VALUE_MATE - score) / 2) + ((VALUE_MATE - score) & 1));
+	else if (score <= VALUE_MATED_IN_PLY)
+		return "mate " + std::to_string(-((VALUE_MATE + score) / 2) + ((VALUE_MATE + score) & 1));
 	else
-	{
-		std::vector<std::string> Splitted = pystring::split(command);
-		size_t wtime, winc, btime, binc;
-
-		if ((command.find("winc") != std::string::npos))
-		{
-			// go wtime 189600 btime 189600 winc 9000 binc 9000
-			wtime = std::atoll(Splitted[2].c_str());
-			btime = std::atoll(Splitted[4].c_str());
-			winc = std::atoll(Splitted[6].c_str());
-			binc = std::atoll(Splitted.back().c_str());
-		}
-		else
-		{
-			// go wtime 600 btime 600
-			wtime = std::atoll(Splitted[2].c_str());
-			btime = std::atoll(Splitted.back().c_str());
-			winc = binc = 0;
-		}
-
-		this->core.get_score_move(-1, wtime, winc, btime, binc, false);
-	}
+		return "cp " + std::to_string(score * 100 / NormalizeToPawnValue);
 }
