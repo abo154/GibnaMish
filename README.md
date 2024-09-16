@@ -12,6 +12,7 @@ I have learned a great deal from the following chess engines and would like to e
 
 - [Stockfish](https://github.com/official-stockfish/Stockfish) – [GPL-3.0 License](https://github.com/official-stockfish/Stockfish/blob/master/Copying.txt)
 - [Smallbrain](https://github.com/Disservin/Smallbrain) – [GPL-3.0 License](https://github.com/Disservin/Smallbrain/blob/main/LICENSE)
+- [Chess-Coding-Adventure](https://github.com/SebLague/Chess-Coding-Adventure) - [MIT License](https://github.com/SebLague/Chess-Coding-Adventure/blob/Chess-V2-UCI/LICENSE)
 
 ## Tools and Libraries
 
@@ -22,7 +23,7 @@ Certain parts of the code are adapted from other projects. I extend my thanks to
 
 ## Special Thanks
 
-A special thanks to [Disservin](https://github.com/Disservin) for his projects, which have greatly contributed to my work on GibnaMish. In particular, his Smallbrain engine has been a valuable resource. I also want to acknowledge Bluefever Software's [Chess Engine In C](https://youtube.com/playlist?list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&si=K8UHgAkpbcJxaL9s) YouTube playlist, from which I have gained significant insights.
+A special thanks to [Disservin](https://github.com/Disservin) for his projects, which have greatly contributed to my work on GibnaMish. In particular, his Smallbrain engine has been a valuable resource. I also want to acknowledge Bluefever Software's [Chess Engine In C](https://youtube.com/playlist?list=PLZ1QII7yudbc-Ky058TEaOstZHVbT-2hg&si=K8UHgAkpbcJxaL9s) and Sebastian Lague's [Chess Programming](https://youtube.com/playlist?list=PLFt_AvWsXl0cvHyu32ajwh2qU1i6hl77c&si=fIHbylS4DEQCZTOF) YouTube playlists, from which I have gained significant insights.
 
 ## Getting Started
 
