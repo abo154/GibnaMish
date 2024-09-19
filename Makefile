@@ -17,7 +17,7 @@ else
 endif
 
 OBJ_DIR := obj
-SRC_DIRS := Sources nnue
+SRC_DIRS := Sources
 SRCS := $(wildcard $(addsuffix /*.cpp, $(SRC_DIRS))) main.cpp
 OBJS := $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
