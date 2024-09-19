@@ -143,7 +143,7 @@ void UCI::Process_Go_Command(const std::string& command)
 		auto inc = str_utils::find_element_value<int>(tokens, uci_inc).value_or(0);
 		auto mtg = str_utils::find_element_value<int>(tokens, "movestogo").value_or(0);
 
-		limit.time = this->timer.get_correct_time(time, inc, 40);
+		limit.time = Timer::get_correct_time(time, inc, 40);
 	}
 
 	if (str_utils::is_contain(command, "searchmoves"))

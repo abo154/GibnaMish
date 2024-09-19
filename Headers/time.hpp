@@ -2,15 +2,15 @@
 #ifndef _TIME_HPP_
 #define _TIME_HPP_
 
-#include "types.hpp"
+#include <cstdint>
 
 class Timer
 {
 public:
-	size_t get_correct_time(size_t, size_t, size_t);
+	static size_t get_correct_time(size_t, size_t, size_t);
 private:
-	bool useMaxThinkTime = false;
-	int maxThinkTimeMs = 2500;
+	static bool useMaxThinkTime;
+	static int maxThinkTimeMs;
 };
 
 #endif // !_TIME_HPP_

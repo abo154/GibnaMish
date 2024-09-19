@@ -13,7 +13,6 @@ public:
 private:
 	chess::Board Board;
 	chess::Movelist Searchmoves;
-	Timer timer;
 	int worker_threads;
 	bool use_tb = false;
 

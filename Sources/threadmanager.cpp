@@ -57,10 +57,10 @@ void ThreadPool::start(const chess::Board &board, const Limits &limit, const che
 
     this->pool.emplace_back(mainThread);
 
-    // start at index 1 to keep "mainthread" data alive
     mainThread.search->History.reset();
     mainThread.search->Counters.reset();
 
+    // start at index 1 to keep "mainthread" data alive
     for (int i = 1; i < worker_count; i++)
     {
         mainThread.search->id = i;
