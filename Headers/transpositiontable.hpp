@@ -4,7 +4,10 @@
 
 #include <vector>
 
+#define CHESS_NO_EXCEPTIONS
 #include "chesslib/chess.hpp"
+#undef CHESS_NO_EXCEPTIONS
+
 #include "types.hpp"
 
 using Age = uint32_t;

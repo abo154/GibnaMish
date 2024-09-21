@@ -7,8 +7,11 @@
 #include "table.hpp"
 #include "types.hpp"
 #include "evaluate.hpp"
-#include "chesslib/chess.hpp"
 #include "transpositiontable.hpp"
+
+#define CHESS_NO_EXCEPTIONS
+#include "chesslib/chess.hpp"
+#undef CHESS_NO_EXCEPTIONS
 
 struct Stack
 {

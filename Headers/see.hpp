@@ -2,7 +2,10 @@
 #ifndef _SEE_HPP_
 #define _SEE_HPP_
 
+#define CHESS_NO_EXCEPTIONS
 #include "chesslib/chess.hpp"
+#undef CHESS_NO_EXCEPTIONS
+
 #include "piecesbouns.hpp"
 
 namespace see

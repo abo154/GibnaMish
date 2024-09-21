@@ -2,7 +2,9 @@
 #ifndef _GLOBAL_HPP_
 #define _GLOBAL_HPP_
 
+#define CHESS_NO_EXCEPTIONS
 #include "chesslib/chess.hpp"
+#undef CHESS_NO_EXCEPTIONS
 
 using Score = int32_t;
 using Depth = int32_t;

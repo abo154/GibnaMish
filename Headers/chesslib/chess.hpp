@@ -1802,12 +1802,16 @@ class Board {
 
         static auto parseStringViewToInt = [](std::string_view sv) -> std::optional<int> {
             if (!sv.empty() && sv.back() == ';') sv.remove_suffix(1);
+#ifndef CHESS_NO_EXCEPTIONS
             try {
+#endif
                 size_t pos;
                 int value = std::stoi(std::string(sv), &pos);
                 if (pos == sv.size()) return value;
+#ifndef CHESS_NO_EXCEPTIONS
             } catch (...) {
             }
+#endif
             return std::nullopt;
         };
 
@@ -2816,12 +2820,16 @@ class Board {
 
         static auto parseStringViewToInt = [](std::string_view sv) -> std::optional<int> {
             if (!sv.empty() && sv.back() == ';') sv.remove_suffix(1);
+#ifndef CHESS_NO_EXCEPTIONS
             try {
+#endif
                 size_t pos;
                 int value = std::stoi(std::string(sv), &pos);
                 if (pos == sv.size()) return value;
+#ifndef CHESS_NO_EXCEPTIONS
             } catch (...) {
             }
+#endif
             return std::nullopt;
         };
 

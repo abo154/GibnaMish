@@ -2,7 +2,9 @@
 #ifndef _PIECES_BOUNS_HPP_
 #define _PIECES_BOUNS_HPP_
 
+#define CHESS_NO_EXCEPTIONS
 #include "chesslib/chess.hpp"
+#undef CHESS_NO_EXCEPTIONS
 
 namespace piecesbouns
 {

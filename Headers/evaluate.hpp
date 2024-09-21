@@ -2,7 +2,10 @@
 #ifndef _EVALUATE_HPP_
 #define _EVALUATE_HPP_
 
+#define CHESS_NO_EXCEPTIONS
 #include "chesslib/chess.hpp"
+#undef CHESS_NO_EXCEPTIONS
+
 #include "types.hpp"
 
 class Evaluate

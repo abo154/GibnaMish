@@ -10,11 +10,7 @@ else
 	TARGET = -march=native
 endif
 
-ifeq ($(build), release)
-	CFLAGS = -Wall -std=c++20 -static -O3 -mtune=native -static-libgcc -static-libstdc++ -pie -lm -fno-rtti -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fPIC -flto
-else
-	CFLAGS = -Wall -std=c++20 -static -O3 -DNDEBUG -mtune=native -static-libgcc -static-libstdc++ -pie -lm -fno-rtti -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fPIC -flto
-endif
+CFLAGS = -Wall -std=c++20 -static -O3 -DNDEBUG -mtune=native -Wcast-qual -static-libgcc -static-libstdc++ -pie -lm -fno-exceptions -fno-rtti -Wextra -Wno-unused-variable -Wno-unused-result -Wno-unused-but-set-variable -Wno-maybe-uninitialized -pedantic -funroll-loops -fPIC -flto
 
 OBJ_DIR := obj
 SRC_DIRS := Sources
